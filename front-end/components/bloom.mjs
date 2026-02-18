@@ -26,10 +26,13 @@ const createBloom = (template, bloom) => {
   bloomUsername.textContent = bloom.sender;
   bloomTime.textContent = _formatTimestamp(bloom.sent_timestamp);
   bloomTimeLink.setAttribute("href", `/bloom/${bloom.id}`);
-  bloomContent.replaceChildren(
-    ...bloomParser.parseFromString(_formatHashtags(bloom.content), "text/html")
+
+  const parsedNodes = Array.from(
+    bloomParser.parseFromString(_formatHashtags(bloom.content), "text/html")
       .body.childNodes
-  );
+  ).filter(node => node.nodeType !== Node.TEXT_NODE || node.textContent.trim() !== "");
+
+  bloomContent.replaceChildren(...parsedNodes);
 
   return bloomFrag;
 };
