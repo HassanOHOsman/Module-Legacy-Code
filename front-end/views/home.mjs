@@ -1,4 +1,5 @@
 import {renderEach, renderOne, destroy} from "../lib/render.mjs";
+import { apiService } from "../lib/api.mjs";
 import {
   state,
   getLogoutContainer,
@@ -45,10 +46,10 @@ function homeView() {
         const bloomId = bloomArticle.getAttribute("data-bloom-id");
 
         try {
-          await apiService.rebloom(bloomId);
+          const data = await apiService.rebloom(bloomId);
           const counter = button.querySelector("[data-rebloom-count]");
           let count = parseInt(counter.textContent) || 0;
-          counter.textContent = count + 1;
+          counter.textContent = data.rebloom_count ?? count + 1;
         } catch (error) {
           console.error("Unable to rebloom:", error);
         }
