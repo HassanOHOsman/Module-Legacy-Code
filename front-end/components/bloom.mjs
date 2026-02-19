@@ -39,7 +39,6 @@ function _formatHashtags(text) {
   return text.replace(
     /\B#\w+/g,
     (match) => {
-      const tag = match.slice(1);
       return `<a href="/hashtag/${match.slice(1)}">${match}</a>`;
 
     });
