@@ -212,6 +212,11 @@ async function postBloom(content) {
   }
 }
 
+async function rebloom(bloomId) {
+  const token = state.token;
+  return await __apiRequest(`/blooms/${bloomId}/rebloom`, "POST", {}, token);
+}
+
 // ======= USER methods
 async function getProfile(username) {
   const endpoint = username ? `/profile/${username}` : "/profile";
