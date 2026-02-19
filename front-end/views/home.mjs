@@ -38,6 +38,25 @@ function homeView() {
       "bloom-template",
       createBloom
     );
+
+    document.querySelectorAll("[data-action='rebloom']").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const bloomArticle = button.closest("[data-bloom]");
+        const bloomId = bloomArticle.getAttribute("data-bloom-id");
+
+        try {
+          await apiService.rebloom(bloomId);
+          const counter = button.querySelector("[data-rebloom-count]");
+          let count = parseInt(counter.textContent) || 0;
+          counter.textContent = count + 1;
+        } catch (error) {
+          console.error("Unable to rebloom:", error);
+        }
+
+      });
+
+    });
+
     renderOne(
       state.isLoggedIn,
       getBloomFormContainer(),
