@@ -213,8 +213,13 @@ async function postBloom(content) {
 }
 
 async function rebloom(bloomId) {
-  const token = state.token;
-  return await __apiRequest(`/blooms/${bloomId}/rebloom`, "POST", {}, token);
+  try {
+    const data = await __apiRequest(`/blooms/${bloomId}/rebloom`, { method: "POST",});
+
+    return data; 
+  } catch (error) {
+    return { success: false };
+  }
 }
 
 // ======= USER methods
@@ -297,6 +302,7 @@ const apiService = {
   getBlooms,
   postBloom,
   getBloomsByHashtag,
+  rebloom,
 
   // User methods
   getProfile,
