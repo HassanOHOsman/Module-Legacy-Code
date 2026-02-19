@@ -167,6 +167,21 @@ def send_bloom():
     )
 
 
+@jwt_required()
+def rebloom(bloom_id):
+   current_user = get_current_user()
+   original_bloom = blooms.get_bloom(int(bloom_id))
+
+   if original_bloom is None:
+       return make_response(jsonify({"success": False, "message": "Bloom not found"}), 404)
+   
+   blooms.add_bloom(bloom_id, current_user.username)
+   rebloom_count = len(original_bloom.get("reblooms", []))
+
+   return jsonify({"success": True, "rebloom_count": rebloom_count})
+
+
+
 def get_bloom(id_str):
     try:
         id_int = int(id_str)
