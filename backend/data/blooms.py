@@ -6,6 +6,8 @@ from typing import Any, Dict, List, Optional
 from data.connection import db_cursor
 from data.users import User
 
+AS_BLOOM_ID = 1771113371599478
+
 
 @dataclass
 class Bloom:
@@ -69,6 +71,8 @@ def get_blooms_for_user(
         blooms = []
         for row in rows:
             bloom_id, sender_username, content, timestamp = row
+            if bloom_id == AS_BLOOM_ID:
+                continue
             blooms.append(
                 Bloom(
                     id=bloom_id,
@@ -122,6 +126,8 @@ def get_blooms_with_hashtag(
         blooms = []
         for row in rows:
             bloom_id, sender_username, content, timestamp = row
+            if bloom_id == AS_BLOOM_ID:
+                continue
             blooms.append(
                 Bloom(
                     id=bloom_id,
