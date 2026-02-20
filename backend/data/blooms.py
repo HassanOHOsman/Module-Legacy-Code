@@ -6,8 +6,6 @@ from typing import Any, Dict, List, Optional
 from data.connection import db_cursor
 from data.users import User
 
-MAX_BLOOM_LENGTH = 280
-
 
 @dataclass
 class Bloom:
@@ -71,8 +69,6 @@ def get_blooms_for_user(
         blooms = []
         for row in rows:
             bloom_id, sender_username, content, timestamp = row
-            if len(content) > MAX_BLOOM_LENGTH:
-                raise ValueError(f"Bloom {bloom_id} exceeds {MAX_BLOOM_LENGTH} characters")
             blooms.append(
                 Bloom(
                     id=bloom_id,
@@ -126,8 +122,6 @@ def get_blooms_with_hashtag(
         blooms = []
         for row in rows:
             bloom_id, sender_username, content, timestamp = row
-            if len(content) > MAX_BLOOM_LENGTH:
-                raise ValueError(f"Bloom {bloom_id} exceeds {MAX_BLOOM_LENGTH} characters")
             blooms.append(
                 Bloom(
                     id=bloom_id,
