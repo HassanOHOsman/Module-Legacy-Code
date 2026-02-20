@@ -27,7 +27,7 @@ const createBloom = (template, bloom) => {
   bloomTime.textContent = _formatTimestamp(bloom.sent_timestamp);
   bloomTimeLink.setAttribute("href", `/bloom/${bloom.id}`);
   bloomContent.replaceChildren(
-    ...bloomParser.parseFromString(_formatHashtags(bloom.content.slice(0, 280)), "text/html")
+    ...bloomParser.parseFromString(_formatHashtags(bloom.content), "text/html")
       .body.childNodes
   );
 
