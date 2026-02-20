@@ -25,6 +25,7 @@ async function handleBloomSubmit(event) {
   const submitButton = form.querySelector("[data-submit]");
   const originalText = submitButton.textContent;
   const textarea = form.querySelector("textarea");
+  const content = textarea.value.trim();
 
 
   try {
