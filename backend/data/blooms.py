@@ -83,7 +83,7 @@ def get_blooms_for_user(
 
 
 def get_bloom(bloom_id: int) -> Optional[Bloom]:
-    with db_get_bloomcursor() as cur:
+    with db_cursor() as cur:
         cur.execute(
             "SELECT blooms.id, users.username, content, send_timestamp FROM blooms INNER JOIN users ON users.id = blooms.sender_id WHERE blooms.id = %s",
             (bloom_id,),
