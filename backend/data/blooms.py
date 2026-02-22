@@ -69,8 +69,6 @@ def get_blooms_for_user(
         blooms = []
         for row in rows:
             bloom_id, sender_username, content, timestamp = row
-            if len(content) > 280:
-                continue
             blooms.append(
                 Bloom(
                     id=bloom_id,
@@ -124,8 +122,6 @@ def get_blooms_with_hashtag(
         blooms = []
         for row in rows:
             bloom_id, sender_username, content, timestamp = row
-            if len(content) > 280:
-                continue
             blooms.append(
                 Bloom(
                     id=bloom_id,
