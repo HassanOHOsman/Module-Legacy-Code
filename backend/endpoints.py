@@ -177,6 +177,7 @@ def get_bloom(id_str):
         return make_response((f"Bloom not found", 404))
     return jsonify(bloom)
 
+MAX_BLOOM_LENGTH = 280 
 
 @jwt_required()
 def home_timeline():
@@ -197,6 +198,9 @@ def home_timeline():
 
     # Combine own blooms with followed blooms
     all_blooms = followed_blooms + own_blooms
+
+    # Filter long blooms (over 280 characters)
+    all_blooms = [bloom for bloom in all_blooms if len(bloom.content) <= MAX_BLOOM_LENGTH]
 
     # Sort by timestamp (newest first)
     sorted_blooms = list(
