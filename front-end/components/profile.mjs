@@ -28,6 +28,7 @@ function createProfile(template, {profileData, whoToFollow, isLoggedIn}) {
   followingCountEl.textContent = profileData.follows?.length || 0;
   followButtonEl.setAttribute("data-username", profileData.username || "");
   followButtonEl.hidden = profileData.is_self;
+  followButtonEl.textContent = profileData.is_following ? "Unfollow" : "Follow";
   followButtonEl.addEventListener("click", handleFollow);
   if (!isLoggedIn) {
     followButtonEl.style.display = "none";
