@@ -144,3 +144,27 @@ def make_limit_clause(limit: Optional[int], kwargs: Dict[Any, Any]) -> str:
     else:
         limit_clause = ""
     return limit_clause
+
+
+def add_rebloom(*, bloom_id: int, rebloomer: User):
+    with db_cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO reblooms (
+                bloom_id,
+                rebloomer_id,
+                rebloom_timestamp
+            )
+            VALUES (
+                %(bloom_id)s,
+                %(rebloomer_id)s,
+                %(timestamp)s
+            )
+            ON CONFLICT DO NOTHING
+            """,
+            dict(
+                bloom_id=bloom_id,
+                rebloomer_id=rebloomer.id,
+                timestamp=datetime.datetime.now(datetime.UTC),
+            ),
+        )
