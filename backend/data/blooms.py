@@ -168,3 +168,14 @@ def add_rebloom(*, bloom_id: int, rebloomer: User):
                 timestamp=datetime.datetime.now(datetime.UTC),
             ),
         )
+
+
+
+def get_rebloom_count(bloom_id: int) -> int:
+    with db_cursor() as cur:
+        cur.execute(
+            "SELECT COUNT(*) FROM reblooms WHERE bloom_id = %s",
+            (bloom_id,),
+        )
+
+        return cur.fetchone()[0]
