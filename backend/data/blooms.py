@@ -13,6 +13,10 @@ class Bloom:
     sender: User
     content: str
     sent_timestamp: datetime.datetime
+    rebloomed_by: Optional[str] = None
+    rebloom_timestamp: Optional[datetime.datetime] = None
+    rebloom_count: int = 0
+
 
 
 def add_bloom(*, sender: User, content: str) -> Bloom:
