@@ -182,10 +182,10 @@ async function getBloomsByHashtag(hashtag) {
 
   try {
     const blooms = await _apiRequest(endpoint);
-    state.updateState({
-      hashtagBlooms: blooms,
-      currentHashtag: `#${tag}`,
-    });
+    // state.updateState({
+    //   // hashtagBlooms: blooms,
+    //   // currentHashtag: `#${tag}`,
+    // });
     return blooms;
   } catch (error) {
     // Error already handled by _apiRequest
