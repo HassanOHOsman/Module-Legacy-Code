@@ -36,12 +36,11 @@ const createBloom = (template, bloom) => {
       .body.childNodes
   );
 
-  if (bloom.rebloomed_by) {
-  rebloomInfo.textContent =
-    `${bloom.rebloomed_by} rebloomed`;
-} else {
-  rebloomInfo?.remove();
-}
+  if (bloom.rebloomed_by && rebloomInfo) {
+    rebloomInfo.textContent = `${bloom.rebloomed_by} rebloomed`;
+  } else {
+    rebloomInfo?.remove();
+  }
 
 if (bloom.rebloom_count > 0) {
   rebloomCount.textContent =
