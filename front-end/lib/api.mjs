@@ -214,7 +214,9 @@ async function postBloom(content) {
 
 async function rebloom(bloomId) {
   try {
-    const data = await __apiRequest(`/blooms/${bloomId}/rebloom`, { method: "POST",});
+    const data = await _apiRequest(`/blooms/${bloomId}/rebloom`, {
+      method: "POST",
+    });
 
     return data; 
   } catch (error) {
