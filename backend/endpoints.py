@@ -212,31 +212,43 @@ def get_bloom(id_str):
 def home_timeline():
     current_user = get_current_user()
 
-    # Get blooms from followed users
+    # Users whose blooms/reblooms should appear in the timeline
     followed_users = get_followed_usernames(current_user)
+
+    timeline_users = list(followed_users) + [current_user.username]
+
+    # Get normal blooms from followed users
     nested_user_blooms = [
-        blooms.get_blooms_for_user(followed_user, limit=50)
-        for followed_user in followed_users
+        blooms.get_blooms_for_user(username, limit=50)
+        for username in timeline_users
     ]
 
-    # Flatten list of blooms from followed users
-    followed_blooms = [bloom for blooms in nested_user_blooms for bloom in blooms]
+    followed_blooms = [
+        bloom
+        for user_blooms in nested_user_blooms
+        for bloom in user_blooms
+    ]
 
-    # Get the current user's own blooms
-    own_blooms = blooms.get_blooms_for_user(current_user.username, limit=50)
-
-    # Get the current user's reblooms
-    rebloomed_blooms = blooms.get_reblooms_for_user(
-        current_user.username,
+    # Get reblooms made by the current user or people they follow
+    reblooms = blooms.get_reblooms_for_users(
+        timeline_users,
         limit=50,
     )
 
-    # Combine own blooms with followed blooms
-    all_blooms = followed_blooms + own_blooms + rebloomed_blooms
+    # Combine normal blooms and reblooms
+    all_blooms = followed_blooms + reblooms
 
-    # Sort by timestamp (newest first)
-    sorted_blooms = list(
-        sorted(all_blooms, key=lambda bloom: bloom.sent_timestamp, reverse=True)
+    # Normal blooms use sent_timestamp.
+    # Reblooms use rebloom_timestamp because that is when
+    # the item was added to the timeline.
+    sorted_blooms = sorted(
+        all_blooms,
+        key=lambda bloom: (
+            bloom.rebloom_timestamp
+            if bloom.rebloom_timestamp is not None
+            else bloom.sent_timestamp
+        ),
+        reverse=True,
     )
 
     return jsonify(sorted_blooms)
