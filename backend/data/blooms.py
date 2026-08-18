@@ -219,11 +219,14 @@ def get_rebloom_count(bloom_id: int) -> int:
 
 
 
-def get_reblooms_for_user(
-    username: str, *, limit: Optional[int] = None
+def get_reblooms_for_users(
+    usernames: List[str], *, limit: Optional[int] = None
 ) -> List[Bloom]:
+    if not usernames:
+        return []
+    
     kwargs = {
-        "username": username,
+        "usernames": usernames,
     }
 
     limit_clause = make_limit_clause(limit, kwargs)
@@ -245,7 +248,7 @@ def get_reblooms_for_user(
                 ON blooms.id = reblooms.bloom_id
             INNER JOIN users AS original_user
                 ON original_user.id = blooms.sender_id
-            WHERE rebloom_users.username = %(username)s
+            WHERE rebloom_users.username = ANY(%(usernames)s)
             ORDER BY reblooms.rebloom_timestamp DESC
             {limit_clause}
             """,
