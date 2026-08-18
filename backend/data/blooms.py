@@ -58,13 +58,24 @@ def get_blooms_for_user(
 
         cur.execute(
             f"""SELECT
-              blooms.id, users.username, content, send_timestamp
+                blooms.id,
+                users.username,
+                blooms.content,
+                blooms.send_timestamp,
+                COUNT(reblooms.id)
             FROM
-              blooms INNER JOIN users ON users.id = blooms.sender_id
+                blooms
+                INNER JOIN users ON users.id = blooms.sender_id
+                LEFT JOIN reblooms ON reblooms.bloom_id = blooms.id
             WHERE
-              username = %(sender_username)s
-              {before_clause}
-            ORDER BY send_timestamp DESC
+                users.username = %(sender_username)s
+                {before_clause}
+            GROUP BY
+                blooms.id,
+                users.username,
+                blooms.content,
+                blooms.send_timestamp
+            ORDER BY blooms.send_timestamp DESC
             {limit_clause}
             """,
             kwargs,
