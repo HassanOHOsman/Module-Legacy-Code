@@ -215,3 +215,60 @@ def get_rebloom_count(bloom_id: int) -> int:
         )
 
         return cur.fetchone()[0]
+    
+
+
+
+def get_reblooms_for_user(
+    username: str, *, limit: Optional[int] = None
+) -> List[Bloom]:
+    kwargs = {
+        "username": username,
+    }
+
+    limit_clause = make_limit_clause(limit, kwargs)
+
+    with db_cursor() as cur:
+        cur.execute(
+            f"""
+            SELECT
+                blooms.id,
+                original_user.username,
+                blooms.content,
+                blooms.send_timestamp,
+                rebloom_users.username,
+                reblooms.rebloom_timestamp
+            FROM reblooms
+            INNER JOIN users AS rebloom_users
+                ON rebloom_users.id = reblooms.rebloomer_id
+            INNER JOIN blooms
+                ON blooms.id = reblooms.bloom_id
+            INNER JOIN users AS original_user
+                ON original_user.id = blooms.sender_id
+            WHERE rebloom_users.username = %(username)s
+            ORDER BY reblooms.rebloom_timestamp DESC
+            {limit_clause}
+            """,
+            kwargs,
+        )
+
+        rows = cur.fetchall()
+
+        return [
+            Bloom(
+                id=bloom_id,
+                sender=original_username,
+                content=content,
+                sent_timestamp=sent_timestamp,
+                rebloomed_by=rebloomer_username,
+                rebloom_timestamp=rebloom_timestamp,
+            )
+            for (
+                bloom_id,
+                original_username,
+                content,
+                sent_timestamp,
+                rebloomer_username,
+                rebloom_timestamp,
+            ) in rows
+        ]
