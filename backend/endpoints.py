@@ -225,8 +225,14 @@ def home_timeline():
     # Get the current user's own blooms
     own_blooms = blooms.get_blooms_for_user(current_user.username, limit=50)
 
+    # Get the current user's reblooms
+    rebloomed_blooms = blooms.get_reblooms_for_user(
+        current_user.username,
+        limit=50,
+    )
+
     # Combine own blooms with followed blooms
-    all_blooms = followed_blooms + own_blooms
+    all_blooms = followed_blooms + own_blooms + rebloomed_blooms
 
     # Sort by timestamp (newest first)
     sorted_blooms = list(
