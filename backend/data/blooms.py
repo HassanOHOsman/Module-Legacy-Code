@@ -179,7 +179,7 @@ def make_limit_clause(limit: Optional[int], kwargs: Dict[Any, Any]) -> str:
     return limit_clause
 
 
-def add_rebloom(*, bloom_id: int, rebloomer: User):
+def add_rebloom(*, bloom_id: int, rebloomer: User) -> bool:
     with db_cursor() as cur:
         cur.execute(
             """
@@ -194,6 +194,7 @@ def add_rebloom(*, bloom_id: int, rebloomer: User):
                 %(timestamp)s
             )
             ON CONFLICT DO NOTHING
+            RETURNING id
             """,
             dict(
                 bloom_id=bloom_id,
@@ -201,6 +202,8 @@ def add_rebloom(*, bloom_id: int, rebloomer: User):
                 timestamp=datetime.datetime.now(datetime.UTC),
             ),
         )
+
+        return cur.fetchone() is not None
 
 
 
