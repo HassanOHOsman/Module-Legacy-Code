@@ -182,7 +182,7 @@ def rebloom(bloom_id):
             404,
         )
 
-    blooms.add_rebloom(
+    was_created = blooms.add_rebloom(
         bloom_id=int(bloom_id),
         rebloomer=current_user,
     )
@@ -191,6 +191,7 @@ def rebloom(bloom_id):
 
     return jsonify({
         "success": True,
+        "created": was_created,
         "rebloom_count": rebloom_count,
     })
 
