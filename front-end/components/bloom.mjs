@@ -27,7 +27,9 @@ const createBloom = (template, bloom) => {
   bloomArticle.setAttribute("data-bloom-id", bloom.id);
   bloomUsername.setAttribute("href", `/profile/${bloom.sender}`);
   bloomUsername.textContent = bloom.sender;
-  bloomTime.textContent = _formatTimestamp(bloom.sent_timestamp);
+  bloomTime.textContent = _formatTimestamp(
+    bloom.rebloom_timestamp || bloom.sent_timestamp
+  );
   bloomTimeLink.setAttribute("href", `/bloom/${bloom.id}`);
   bloomContent.replaceChildren(
     ...bloomParser.parseFromString(_formatHashtags(bloom.content), "text/html")
