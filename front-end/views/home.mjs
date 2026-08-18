@@ -47,6 +47,7 @@ function homeView() {
 
         try {
           const data = await apiService.rebloom(bloomId);
+          console.log("REBLOOM RESPONSE:", data);
           const counter = button.querySelector("[data-rebloom-count]");
           let count = parseInt(counter.textContent) || 0;
           counter.textContent = data.rebloom_count ?? count + 1;
