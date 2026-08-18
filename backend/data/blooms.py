@@ -87,18 +87,39 @@ def get_blooms_for_user(
 def get_bloom(bloom_id: int) -> Optional[Bloom]:
     with db_cursor() as cur:
         cur.execute(
-            "SELECT blooms.id, users.username, content, send_timestamp FROM blooms INNER JOIN users ON users.id = blooms.sender_id WHERE blooms.id = %s",
+            """
+            SELECT
+                blooms.id,
+                users.username,
+                blooms.content,
+                blooms.send_timestamp,
+                COUNT(reblooms.id)
+            FROM blooms
+            INNER JOIN users ON users.id = blooms.sender_id
+            LEFT JOIN reblooms ON reblooms.bloom_id = blooms.id
+            WHERE blooms.id = %s
+            GROUP BY
+                blooms.id,
+                users.username,
+                blooms.content,
+                blooms.send_timestamp
+            """,
             (bloom_id,),
         )
+
         row = cur.fetchone()
+
         if row is None:
             return None
-        bloom_id, sender_username, content, timestamp = row
+
+        bloom_id, sender_username, content, timestamp, rebloom_count = row
+
         return Bloom(
             id=bloom_id,
             sender=sender_username,
             content=content,
             sent_timestamp=timestamp,
+            rebloom_count=rebloom_count,
         )
 
 
