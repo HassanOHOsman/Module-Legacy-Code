@@ -34,5 +34,5 @@ CREATE TABLE reblooms (
     rebloomer_id INT NOT NULL REFERENCES users(id),
     rebloom_timestamp TIMESTAMP NOT NULL,
 
-    UNIQUE(bloom_id, rebloomer_id)
+   
 );
