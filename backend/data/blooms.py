@@ -193,7 +193,6 @@ def add_rebloom(*, bloom_id: int, rebloomer: User) -> bool:
                 %(rebloomer_id)s,
                 %(timestamp)s
             )
-            ON CONFLICT DO NOTHING
             RETURNING id
             """,
             dict(
