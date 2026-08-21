@@ -47,6 +47,22 @@ def rebloom(
     with db_cursor() as cur:
         cur.execute(
             """
+            SELECT COALESCE(original_bloom_id, id)
+            FROM blooms
+            WHERE id = %(original_bloom_id)s
+            """,
+            {"original_bloom_id": original_bloom_id},
+        )
+
+        row = cur.fetchone()
+
+        if row is None:
+            return None
+
+        root_bloom_id = row[0]
+
+        cur.execute(
+            """
             INSERT INTO blooms (
                 id,
                 sender_id,
@@ -59,7 +75,7 @@ def rebloom(
                 %(sender_id)s,
                 content,
                 %(timestamp)s,
-                id
+                %(root_bloom_id)s
             FROM blooms
             WHERE id = %(original_bloom_id)s
             RETURNING id, sender_id, content, send_timestamp, original_bloom_id
@@ -69,6 +85,7 @@ def rebloom(
                 "sender_id": sender.id,
                 "timestamp": now,
                 "original_bloom_id": original_bloom_id,
+                "root_bloom_id": root_bloom_id,
             },
         )
 
@@ -77,8 +94,6 @@ def rebloom(
         if row is None:
             return None
 
-        bloom_id, sender_id, content, timestamp, original_id = row
-        
         cur.execute(
             """
             INSERT INTO reblooms (
@@ -94,20 +109,14 @@ def rebloom(
             """,
             {
                 "rebloomer_id": sender.id,
-                "bloom_id": original_id,
+                "bloom_id": root_bloom_id,
                 "timestamp": now,
             },
         )
 
-    original_bloom = get_bloom(original_id)
+    return get_bloom(bloom_id)
 
-    return Bloom(
-        id=bloom_id,
-        sender=sender,
-        content=content,
-        sent_timestamp=timestamp,
-        original_bloom=original_bloom,
-    )
+ 
 
 
 def get_blooms_for_user(
