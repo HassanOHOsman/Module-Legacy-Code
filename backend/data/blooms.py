@@ -78,6 +78,26 @@ def rebloom(
             return None
 
         bloom_id, sender_id, content, timestamp, original_id = row
+        
+        cur.execute(
+            """
+            INSERT INTO reblooms (
+                rebloomer_id,
+                bloom_id,
+                rebloom_timestamp
+            )
+            VALUES (
+                %(rebloomer_id)s,
+                %(bloom_id)s,
+                %(timestamp)s
+            )
+            """,
+            {
+                "rebloomer_id": sender.id,
+                "bloom_id": original_id,
+                "timestamp": now,
+            },
+        )
 
     original_bloom = get_bloom(original_id)
 
@@ -113,7 +133,15 @@ def get_blooms_for_user(
                 users.username,
                 blooms.content,
                 blooms.send_timestamp,
-                blooms.original_bloom_id
+                blooms.original_bloom_id,
+                (
+                    SELECT COUNT(*)
+                    FROM reblooms
+                    WHERE reblooms.bloom_id = COALESCE(
+                        blooms.original_bloom_id,
+                        blooms.id
+                    )
+                )  AS rebloom_count
             FROM blooms
             INNER JOIN users
                 ON users.id = blooms.sender_id
@@ -135,6 +163,7 @@ def get_blooms_for_user(
                 content,
                 timestamp,
                 original_bloom_id,
+                rebloom_count,
             ) = row
 
             original_bloom = (
@@ -150,6 +179,7 @@ def get_blooms_for_user(
                     content=content,
                     sent_timestamp=timestamp,
                     original_bloom=original_bloom,
+                    rebloom_count=rebloom_count,
                 )
             )
 
@@ -165,7 +195,15 @@ def get_bloom(bloom_id: int) -> Optional[Bloom]:
                 users.username,
                 blooms.content,
                 blooms.send_timestamp,
-                blooms.original_bloom_id
+                blooms.original_bloom_id,
+                (
+                    SELECT COUNT(*)
+                    FROM reblooms
+                    WHERE reblooms.bloom_id = COALESCE(
+                        blooms.original_bloom_id,
+                        blooms.id
+                    )
+                ) AS rebloom_count
             FROM blooms
             INNER JOIN users ON users.id = blooms.sender_id
             WHERE blooms.id = %s
@@ -184,6 +222,7 @@ def get_bloom(bloom_id: int) -> Optional[Bloom]:
             content,
             timestamp,
             original_bloom_id,
+            rebloom_count,
         ) = row
 
         original_bloom = (
@@ -198,8 +237,8 @@ def get_bloom(bloom_id: int) -> Optional[Bloom]:
             content=content,
             sent_timestamp=timestamp,
             original_bloom=original_bloom,
+            rebloom_count=rebloom_count,
         )
-    
 
 def get_blooms_with_hashtag(
     hashtag_without_leading_hash: str, *, limit: int = None
