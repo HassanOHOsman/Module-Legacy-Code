@@ -37,7 +37,9 @@ def add_bloom(*, sender: User, content: str) -> Bloom:
                 dict(hashtag=hashtag, bloom_id=bloom_id),
             )
 
-def rebloom(*, sender: User, original_bloom_id: int) -> Bloom:
+def rebloom(
+    *, sender: User, original_bloom_id: int
+) -> Optional[Bloom]:
     now = datetime.datetime.now(tz=datetime.UTC)
     bloom_id = int(now.timestamp() * 1000000)
 
