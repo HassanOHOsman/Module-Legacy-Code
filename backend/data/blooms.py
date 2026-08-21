@@ -162,9 +162,9 @@ def get_bloom(bloom_id: int) -> Optional[Bloom]:
             SELECT
                 blooms.id,
                 users.username,
-                content,
-                send_timestamp,
-                original_bloom_id
+                blooms.content,
+                blooms.send_timestamp,
+                blooms.original_bloom_id
             FROM blooms
             INNER JOIN users ON users.id = blooms.sender_id
             WHERE blooms.id = %s
@@ -177,7 +177,13 @@ def get_bloom(bloom_id: int) -> Optional[Bloom]:
         if row is None:
             return None
 
-        bloom_id, sender_username, content, timestamp, original_bloom_id = row
+        (
+            bloom_id,
+            sender_username,
+            content,
+            timestamp,
+            original_bloom_id,
+        ) = row
 
         original_bloom = (
             get_bloom(original_bloom_id)
@@ -192,7 +198,7 @@ def get_bloom(bloom_id: int) -> Optional[Bloom]:
             sent_timestamp=timestamp,
             original_bloom=original_bloom,
         )
-
+    
 
 def get_blooms_with_hashtag(
     hashtag_without_leading_hash: str, *, limit: int = None
