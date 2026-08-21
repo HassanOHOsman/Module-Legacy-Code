@@ -10,8 +10,11 @@
  * "sent_timestamp": "datetime as ISO 8601 formatted string"}
 
  */
+import { apiService } from "../index.mjs";
+
 const createBloom = (template, bloom) => {
   if (!bloom) return;
+
   const bloomFrag = document.getElementById(template).content.cloneNode(true);
   const bloomParser = new DOMParser();
 
@@ -20,16 +23,33 @@ const createBloom = (template, bloom) => {
   const bloomTime = bloomFrag.querySelector("[data-time]");
   const bloomTimeLink = bloomFrag.querySelector("a:has(> [data-time])");
   const bloomContent = bloomFrag.querySelector("[data-content]");
+  const rebloomButton = bloomFrag.querySelector("[data-action='rebloom']");
 
   bloomArticle.setAttribute("data-bloom-id", bloom.id);
   bloomUsername.setAttribute("href", `/profile/${bloom.sender}`);
   bloomUsername.textContent = bloom.sender;
   bloomTime.textContent = _formatTimestamp(bloom.sent_timestamp);
   bloomTimeLink.setAttribute("href", `/bloom/${bloom.id}`);
+
   bloomContent.replaceChildren(
     ...bloomParser.parseFromString(_formatHashtags(bloom.content), "text/html")
       .body.childNodes
   );
+
+  // Handle rebloom
+  rebloomButton.addEventListener("click", async () => {
+    try {
+      rebloomButton.disabled = true;
+      rebloomButton.textContent = "Reblooming...";
+
+      await apiService.rebloom(bloom.id);
+    } catch (error) {
+      console.error("Failed to rebloom:", error);
+    } finally {
+      rebloomButton.disabled = false;
+      rebloomButton.textContent = "Rebloom";
+    }
+  });
 
   return bloomFrag;
 };
