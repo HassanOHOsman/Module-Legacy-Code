@@ -37,6 +37,55 @@ def add_bloom(*, sender: User, content: str) -> Bloom:
                 dict(hashtag=hashtag, bloom_id=bloom_id),
             )
 
+def rebloom(*, sender: User, original_bloom_id: int) -> Bloom:
+    now = datetime.datetime.now(tz=datetime.UTC)
+    bloom_id = int(now.timestamp() * 1000000)
+
+    with db_cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO blooms (
+                id,
+                sender_id,
+                content,
+                send_timestamp,
+                original_bloom_id
+            )
+            SELECT
+                %(bloom_id)s,
+                %(sender_id)s,
+                content,
+                %(timestamp)s,
+                id
+            FROM blooms
+            WHERE id = %(original_bloom_id)s
+            RETURNING id, sender_id, content, send_timestamp, original_bloom_id
+            """,
+            {
+                "bloom_id": bloom_id,
+                "sender_id": sender.id,
+                "timestamp": now,
+                "original_bloom_id": original_bloom_id,
+            },
+        )
+
+        row = cur.fetchone()
+
+        if row is None:
+            return None
+
+        bloom_id, sender_id, content, timestamp, original_id = row
+
+    original_bloom = get_bloom(original_id)
+
+    return Bloom(
+        id=bloom_id,
+        sender=sender,
+        content=content,
+        sent_timestamp=timestamp,
+        original_bloom=original_bloom,
+    )
+
 
 def get_blooms_for_user(
     username: str, *, before: Optional[int] = None, limit: Optional[int] = None
