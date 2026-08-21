@@ -23,6 +23,7 @@ const createBloom = (template, bloom) => {
   const bloomTime = bloomFrag.querySelector("[data-time]");
   const bloomTimeLink = bloomFrag.querySelector("a:has(> [data-time])");
   const bloomContent = bloomFrag.querySelector("[data-content]");
+  const rebloomInfo = bloomFrag.querySelector("[data-rebloom-info]");
   const rebloomButton = bloomFrag.querySelector("[data-action='rebloom']");
 
   bloomArticle.setAttribute("data-bloom-id", bloom.id);
@@ -35,6 +36,11 @@ const createBloom = (template, bloom) => {
     ...bloomParser.parseFromString(_formatHashtags(bloom.content), "text/html")
       .body.childNodes
   );
+
+  if (bloom.original_bloom) {
+    rebloomInfo.hidden = false;
+    rebloomInfo.textContent = `Rebloomed from ${bloom.original_bloom.sender}`;
+  }
 
   // Handle rebloom
   rebloomButton.addEventListener("click", async () => {
