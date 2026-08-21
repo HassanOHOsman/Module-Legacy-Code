@@ -25,6 +25,7 @@ const createBloom = (template, bloom) => {
   const bloomContent = bloomFrag.querySelector("[data-content]");
   const rebloomInfo = bloomFrag.querySelector("[data-rebloom-info]");
   const rebloomButton = bloomFrag.querySelector("[data-action='rebloom']");
+  const rebloomCount = bloomFrag.querySelector("[data-rebloom-count]");
 
   bloomArticle.setAttribute("data-bloom-id", bloom.id);
   bloomUsername.setAttribute("href", `/profile/${bloom.sender}`);
@@ -49,11 +50,14 @@ const createBloom = (template, bloom) => {
       rebloomButton.textContent = "Reblooming...";
 
       await apiService.rebloom(bloom.id);
+
+      const currentCount = Number(rebloomCount.textContent);
+      rebloomCount.textContent = currentCount + 1;
     } catch (error) {
       console.error("Failed to rebloom:", error);
     } finally {
       rebloomButton.disabled = false;
-      rebloomButton.textContent = "Rebloom";
+      rebloomButton.innerHTML = `Rebloom <span data-rebloom-count>${rebloomCount.textContent}</span>`;
     }
   });
 
