@@ -135,18 +135,39 @@ def get_blooms_for_user(
 def get_bloom(bloom_id: int) -> Optional[Bloom]:
     with db_cursor() as cur:
         cur.execute(
-            "SELECT blooms.id, users.username, content, send_timestamp FROM blooms INNER JOIN users ON users.id = blooms.sender_id WHERE blooms.id = %s",
+            """
+            SELECT
+                blooms.id,
+                users.username,
+                content,
+                send_timestamp,
+                original_bloom_id
+            FROM blooms
+            INNER JOIN users ON users.id = blooms.sender_id
+            WHERE blooms.id = %s
+            """,
             (bloom_id,),
         )
+
         row = cur.fetchone()
+
         if row is None:
             return None
-        bloom_id, sender_username, content, timestamp = row
+
+        bloom_id, sender_username, content, timestamp, original_bloom_id = row
+
+        original_bloom = (
+            get_bloom(original_bloom_id)
+            if original_bloom_id is not None
+            else None
+        )
+
         return Bloom(
             id=bloom_id,
             sender=sender_username,
             content=content,
             sent_timestamp=timestamp,
+            original_bloom=original_bloom,
         )
 
 
