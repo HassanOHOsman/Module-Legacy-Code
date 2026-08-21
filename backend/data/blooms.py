@@ -13,6 +13,7 @@ class Bloom:
     sender: User
     content: str
     sent_timestamp: datetime.datetime
+    original_bloom: Optional["Bloom"] = None
 
 
 def add_bloom(*, sender: User, content: str) -> Bloom:
