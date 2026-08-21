@@ -96,8 +96,9 @@ def get_blooms_for_user(
         kwargs = {
             "sender_username": username,
         }
+
         if before is not None:
-            before_clause = "AND send_timestamp < %(before_limit)s"
+            before_clause = "AND blooms.send_timestamp < %(before_limit)s"
             kwargs["before_limit"] = before
         else:
             before_clause = ""
@@ -105,31 +106,53 @@ def get_blooms_for_user(
         limit_clause = make_limit_clause(limit, kwargs)
 
         cur.execute(
-            f"""SELECT
-              blooms.id, users.username, content, send_timestamp
-            FROM
-              blooms INNER JOIN users ON users.id = blooms.sender_id
-            WHERE
-              username = %(sender_username)s
-              {before_clause}
-            ORDER BY send_timestamp DESC
+            f"""
+            SELECT
+                blooms.id,
+                users.username,
+                blooms.content,
+                blooms.send_timestamp,
+                blooms.original_bloom_id
+            FROM blooms
+            INNER JOIN users
+                ON users.id = blooms.sender_id
+            WHERE users.username = %(sender_username)s
+                {before_clause}
+            ORDER BY blooms.send_timestamp DESC
             {limit_clause}
             """,
             kwargs,
         )
+
         rows = cur.fetchall()
-        blooms = []
+        blooms_list = []
+
         for row in rows:
-            bloom_id, sender_username, content, timestamp = row
-            blooms.append(
+            (
+                bloom_id,
+                sender_username,
+                content,
+                timestamp,
+                original_bloom_id,
+            ) = row
+
+            original_bloom = (
+                get_bloom(original_bloom_id)
+                if original_bloom_id is not None
+                else None
+            )
+
+            blooms_list.append(
                 Bloom(
                     id=bloom_id,
                     sender=sender_username,
                     content=content,
                     sent_timestamp=timestamp,
+                    original_bloom=original_bloom,
                 )
             )
-    return blooms
+
+    return blooms_list
 
 
 def get_bloom(bloom_id: int) -> Optional[Bloom]:
