@@ -30,6 +30,8 @@ const createBloom = (template, bloom) => {
   const isRebloom = Boolean(bloom.original_bloom);
   const displayAuthor = isRebloom ? bloom.original_bloom.sender : bloom.sender;
   const displayTimestamp = isRebloom ? bloom.original_bloom.sent_timestamp : bloom.sent_timestamp;
+  const displayContent = isRebloom ? bloom.original_bloom.content : bloom.content;
+  const displayBloomId = isRebloom ? bloom.original_bloom.id : bloom.id;
   
   rebloomCount.textContent = bloom.rebloom_count ?? 0;
 
