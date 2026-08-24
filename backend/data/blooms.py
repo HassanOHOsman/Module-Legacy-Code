@@ -102,8 +102,8 @@ def get_blooms_for_user(
                 blooms.original_bloom_id,
                 (
                     SELECT COUNT(*)
-                    FROM reblooms
-                    WHERE reblooms.bloom_id = COALESCE(
+                    FROM blooms AS reblooms_of_this
+                    WHERE reblooms_of_this.original_bloom_id = COALESCE(
                         blooms.original_bloom_id,
                         blooms.id
                     )
@@ -164,8 +164,8 @@ def get_bloom(bloom_id: int) -> Optional[Bloom]:
                 blooms.original_bloom_id,
                 (
                     SELECT COUNT(*)
-                    FROM reblooms
-                    WHERE reblooms.bloom_id = COALESCE(
+                    FROM blooms AS reblooms_of_this
+                    WHERE reblooms_of_this.original_bloom_id = COALESCE(
                         blooms.original_bloom_id,
                         blooms.id
                     )
