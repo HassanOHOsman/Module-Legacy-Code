@@ -26,6 +26,10 @@ const createBloom = (template, bloom) => {
   const rebloomInfo = bloomFrag.querySelector("[data-rebloom-info]");
   const rebloomButton = bloomFrag.querySelector("[data-action='rebloom']");
   const rebloomCount = bloomFrag.querySelector("[data-rebloom-count]");
+
+  const isRebloom = Boolean(bloom.original_bloom);
+  const displayAuthor = isRebloom ? bloom.original_bloom.sender : bloom.sender;
+  const displayTimestamp = isRebloom ? bloom.original_bloom.sent_timestamp : bloom.sent_timestamp;
   
   rebloomCount.textContent = bloom.rebloom_count ?? 0;
 
