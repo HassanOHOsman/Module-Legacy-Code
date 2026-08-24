@@ -32,23 +32,24 @@ const createBloom = (template, bloom) => {
   const displayTimestamp = isRebloom ? bloom.original_bloom.sent_timestamp : bloom.sent_timestamp;
   const displayContent = isRebloom ? bloom.original_bloom.content : bloom.content;
   const displayBloomId = isRebloom ? bloom.original_bloom.id : bloom.id;
-  
+
   rebloomCount.textContent = bloom.rebloom_count ?? 0;
 
   bloomArticle.setAttribute("data-bloom-id", bloom.id);
-  bloomUsername.setAttribute("href", `/profile/${bloom.sender}`);
-  bloomUsername.textContent = bloom.sender;
-  bloomTime.textContent = _formatTimestamp(bloom.sent_timestamp);
-  bloomTimeLink.setAttribute("href", `/bloom/${bloom.id}`);
+  bloomArticle.classList.toggle("bloom--rebloom", isRebloom);
+  bloomUsername.setAttribute("href", `/profile/${displayAuthor}`);
+  bloomUsername.textContent = displayAuthor;
+  bloomTime.textContent = _formatTimestamp(displayTimestamp);
+  bloomTimeLink.setAttribute("href", `/bloom/${displayBloomId}`);
 
   bloomContent.replaceChildren(
-    ...bloomParser.parseFromString(_formatHashtags(bloom.content), "text/html")
+    ...bloomParser.parseFromString(_formatHashtags(displayContent), "text/html")
       .body.childNodes
   );
 
-  if (bloom.original_bloom) {
+  if (isRebloom) {
     rebloomInfo.hidden = false;
-    rebloomInfo.textContent = `Rebloomed from ${bloom.original_bloom.sender}`;
+    rebloomInfo.textContent = `🔁 Rebloomed by ${bloom.sender}`;
   }
 
   // Handle rebloom
