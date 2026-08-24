@@ -38,29 +38,12 @@ def add_bloom(*, sender: User, content: str) -> Bloom:
                 dict(hashtag=hashtag, bloom_id=bloom_id),
             )
 
-def rebloom(
-    *, sender: User, original_bloom_id: int
-) -> Optional[Bloom]:
+
+def rebloom(*, sender: User, original_bloom_id: int) -> Optional[Bloom]:
     now = datetime.datetime.now(tz=datetime.UTC)
     bloom_id = int(now.timestamp() * 1000000)
 
     with db_cursor() as cur:
-        cur.execute(
-            """
-            SELECT COALESCE(original_bloom_id, id)
-            FROM blooms
-            WHERE id = %(original_bloom_id)s
-            """,
-            {"original_bloom_id": original_bloom_id},
-        )
-
-        row = cur.fetchone()
-
-        if row is None:
-            return None
-
-        root_bloom_id = row[0]
-
         cur.execute(
             """
             INSERT INTO blooms (
@@ -75,48 +58,22 @@ def rebloom(
                 %(sender_id)s,
                 content,
                 %(timestamp)s,
-                %(root_bloom_id)s
+                COALESCE(original_bloom_id, id)
             FROM blooms
             WHERE id = %(original_bloom_id)s
-            RETURNING id, sender_id, content, send_timestamp, original_bloom_id
+            RETURNING id
             """,
             {
                 "bloom_id": bloom_id,
                 "sender_id": sender.id,
                 "timestamp": now,
                 "original_bloom_id": original_bloom_id,
-                "root_bloom_id": root_bloom_id,
             },
         )
-
-        row = cur.fetchone()
-
-        if row is None:
+        if cur.fetchone() is None:
             return None
 
-        cur.execute(
-            """
-            INSERT INTO reblooms (
-                rebloomer_id,
-                bloom_id,
-                rebloom_timestamp
-            )
-            VALUES (
-                %(rebloomer_id)s,
-                %(bloom_id)s,
-                %(timestamp)s
-            )
-            """,
-            {
-                "rebloomer_id": sender.id,
-                "bloom_id": root_bloom_id,
-                "timestamp": now,
-            },
-        )
-
     return get_bloom(bloom_id)
-
- 
 
 
 def get_blooms_for_user(
