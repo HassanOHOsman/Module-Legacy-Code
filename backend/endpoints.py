@@ -111,7 +111,6 @@ def other_profile(profile_username):
 
     followers = get_inverse_followed_usernames(profile_user)
     all_blooms = blooms.get_blooms_for_user(profile_username)
-    all_blooms.reverse()
     return jsonify(
         {
             "username": profile_username,
